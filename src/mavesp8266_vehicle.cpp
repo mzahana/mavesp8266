@@ -42,9 +42,9 @@
 
 //---------------------------------------------------------------------------------
 MavESP8266Vehicle::MavESP8266Vehicle()
-    : _queue_count(0)
-    , _queue_time(0)
-    , _buffer_status(50.0)
+: _queue_count(0)
+, _queue_time(0)
+, _buffer_status(50.0)
 {
     memset(_message, 0 , sizeof(_message));
 }
@@ -83,7 +83,7 @@ MavESP8266Vehicle::readMessage()
             memset(_message, 0, sizeof(_message));
             _queue_count = 0;
             _queue_time  = millis();
-        //-- Sent at least some?
+            //-- Sent at least some?
         } else if(sent) {
             //-- Move the pending ones up the queue
             int left = _queue_count - sent;
@@ -170,7 +170,7 @@ MavESP8266Vehicle::_readMessage()
                         _last_heartbeat = millis();
                     _checkLinkErrors(&_message[_queue_count]);
                 }
-
+                
                 //-- Check for message we might be interested
                 if(getWorld()->getComponent()->handleMessage(this, &_message[_queue_count])){
                     //-- Eat message (don't send it to GCS)
@@ -178,7 +178,7 @@ MavESP8266Vehicle::_readMessage()
                     msgReceived = false;
                     continue;
                 }
-
+                
                 break;
             }
         }
@@ -201,17 +201,17 @@ MavESP8266Vehicle::_sendRadioStatus()
     //-- Build message
     mavlink_message_t msg;
     mavlink_msg_radio_status_pack(
-        _forwardTo->systemID(),
-        MAV_COMP_ID_UDP_BRIDGE,
-        &msg,
-        0,      // We don't have access to RSSI
-        0,      // We don't have access to Remote RSSI
-        _status.queue_status, // UDP queue status
-        0,      // We don't have access to noise data
-        0,      // We don't have access to remote noise data
-        (uint16_t)(_status.packets_lost / 10),
-        0       // We don't fix anything
-    );
+                                  _forwardTo->systemID(),
+                                  MAV_COMP_ID_UDP_BRIDGE,
+                                  &msg,
+                                  0xff,   // We don't have access to RSSI
+                                  0xff,   // We don't have access to Remote RSSI
+                                  _status.queue_status, // UDP queue status
+                                  0,      // We don't have access to noise data
+                                  0,      // We don't have access to remote noise data
+                                  (uint16_t)(_status.packets_lost / 10),
+                                  0       // We don't fix anything
+                                  );
     sendMessage(&msg);
     _status.radio_status_sent++;
 }

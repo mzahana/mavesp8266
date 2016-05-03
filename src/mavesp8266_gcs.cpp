@@ -42,7 +42,7 @@
 
 //---------------------------------------------------------------------------------
 MavESP8266GCS::MavESP8266GCS()
-    : _udp_port(DEFAULT_UDP_HPORT)
+: _udp_port(DEFAULT_UDP_HPORT)
 {
     memset(&_message, 0, sizeof(_message));
 }
@@ -121,9 +121,9 @@ MavESP8266GCS::_readMessage()
                             _last_heartbeat = millis();
                         _checkLinkErrors(&_message);
                     }
-
-
-
+                    
+                    
+                    
                     //-- Check for message we might be interested
                     if(getWorld()->getComponent()->handleMessage(this, &_message)){
                         //-- Eat message (don't send it to FC)
@@ -131,8 +131,8 @@ MavESP8266GCS::_readMessage()
                         msgReceived = false;
                         continue;
                     }
-
-
+                    
+                    
                     //-- Got message, leave
                     break;
                 }
@@ -197,24 +197,20 @@ void
 MavESP8266GCS::_sendRadioStatus()
 {
     linkStatus* st = _forwardTo->getStatus();
-    uint8_t rssi = 0;
-    if(wifi_get_opmode() == STATION_MODE) {
-        rssi = (uint8_t)wifi_station_get_rssi();
-    }
     //-- Build message
     mavlink_message_t msg;
     mavlink_msg_radio_status_pack(
-        _forwardTo->systemID(),
-        MAV_COMP_ID_UDP_BRIDGE,
-        &msg,
-        rssi,                   // RSSI Only valid in STA mode
-        0,                      // We don't have access to Remote RSSI
-        st->queue_status,       // UDP queue status
-        0,                      // We don't have access to noise data
-        (uint16_t)((st->packets_lost * 100) / st->packets_received),                // Percent of lost messages from Vehicle (UART)
-        (uint16_t)((_status.packets_lost * 100) / _status.packets_received),        // Percent of lost messages from GCS (UDP)
-        0                       // We don't fix anything
-    );
+                                  _forwardTo->systemID(),
+                                  MAV_COMP_ID_UDP_BRIDGE,
+                                  &msg,
+                                  0xff,   // We don't have access to RSSI
+                                  0xff,   // We don't have access to Remote RSSI
+                                  st->queue_status, // UDP queue status
+                                  0,      // We don't have access to noise data
+                                  0,      // We don't have access to remote noise data
+                                  (uint16_t)(_status.packets_lost / 10),
+                                  0       // We don't fix anything
+                                  );
     _sendSingleUdpMessage(&msg);
     _status.radio_status_sent++;
 }
