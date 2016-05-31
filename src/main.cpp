@@ -51,9 +51,9 @@
 class MavESP8266UpdateImp : public MavESP8266Update {
 public:
     MavESP8266UpdateImp ()
-        : _isUpdating(false)
+    : _isUpdating(false)
     {
-
+        
     }
     void updateStarted  ()
     {
@@ -109,13 +109,13 @@ void wait_for_client() {
     int wcount = 0;
     uint8 client_count = wifi_softap_get_station_num();
     while (!client_count) {
-        #ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG
         Serial1.print(".");
         if(++wcount > 80) {
             wcount = 0;
             Serial1.println();
         }
-        #endif
+#endif
         delay(1000);
         client_count = wifi_softap_get_station_num();
     }
@@ -145,21 +145,21 @@ void setup() {
     attachInterrupt(GPIO02, reset_interrupt, FALLING);
 #endif
     Logger.begin(2048);
-
+    
     DEBUG_LOG("\nConfiguring access point...\n");
     DEBUG_LOG("Free Sketch Space: %u\n", ESP.getFreeSketchSpace());
-
+    
     WiFi.disconnect(true);
-
+    
     if(Parameters.getWifiMode() == WIFI_MODE_STA){
         //-- Connect to an existing network
         WiFi.mode(WIFI_STA);
         WiFi.begin(Parameters.getWifiStaSsid(), Parameters.getWifiStaPassword());
         //-- Wait a minute to connect
         for(int i = 0; i < 120 && WiFi.status() != WL_CONNECTED; i++) {
-            #ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG
             Serial.print(".");
-            #endif
+#endif
             delay(500);
         }
         if(WiFi.status() == WL_CONNECTED) {
@@ -171,7 +171,7 @@ void setup() {
             Parameters.setWifiMode(WIFI_MODE_AP);
         }
     }
-
+    
     if(Parameters.getWifiMode() == WIFI_MODE_AP){
         //-- Start AP
         WiFi.mode(WIFI_AP);
@@ -181,15 +181,15 @@ void setup() {
         DEBUG_LOG("Waiting for DHCPD...\n");
         dhcp_status dstat = wifi_station_dhcpc_status();
         while (dstat != DHCP_STARTED) {
-            #ifdef ENABLE_DEBUG
+#ifdef ENABLE_DEBUG
             Serial1.print(".");
-            #endif
+#endif
             delay(500);
             dstat = wifi_station_dhcpc_status();
         }
         wait_for_client();
     }
-
+    
     //-- Boost power to Max
     WiFi.setOutputPower(20.5);
     //-- MDNS
